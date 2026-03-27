@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduPlatform</title>
+
+<style>
+:root {
+  --bg:#0b1220;
+  --card:#111827;
+  --text:#e5e7eb;
+  --muted:#9ca3af;
+  --primary:#6366f1;
+}
+
+body {
+  margin:0;
+  font-family: 'Inter', sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+
+/* NAV */
+.nav {
+  display:flex;
+  justify-content:space-between;
+  padding:16px 30px;
+  background:#020617;
+  border-bottom:1px solid #1f2937;
+}
+
+.nav h2 {
+  margin:0;
+}
+
+/* AUTH */
+.auth {
+  height:90vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.auth-box {
+  background:var(--card);
+  padding:35px;
+  width:320px;
+  border-radius:12px;
+  text-align:center;
+}
+
+.sub {
+  color:var(--muted);
+  font-size:14px;
+}
+
+/* INPUT */
+input {
+  width:100%;
+  padding:12px;
+  margin:10px 0;
+  border-radius:8px;
+  border:none;
+  background:#020617;
+  color:white;
+}
+
+/* BUTTON */
+button {
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border:none;
+  border-radius:8px;
+  background:var(--primary);
+  color:white;
+  cursor:pointer;
+}
+
+button:hover {
+  opacity:0.9;
+}
+
+.ghost {
+  background:transparent;
+  border:1px solid #374151;
+}
+
+/* HERO */
+.hero {
+  padding:30px;
+}
+
+.hero h1 {
+  margin:0;
+}
+
+/* GRID */
+.grid {
+  padding:20px;
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:20px;
+}
+
+/* COURSE */
+.course {
+  background:var(--card);
+  padding:15px;
+  border-radius:12px;
+  transition:0.3s;
+}
+
+.course:hover {
+  transform:translateY(-6px);
+}
+
+.course img {
+  width:100%;
+  border-radius:8px;
+}
+
+.progress {
+  height:6px;
+  background:#1f2937;
+  border-radius:10px;
+  margin:10px 0;
+}
+
+.bar {
+  height:6px;
+  background:var(--primary);
+  border-radius:10px;
+}
+
+/* HIDDEN */
+.hidden {
+  display:none;
+}
+</style>
+</head>
+
+<body>
+
+<header class="nav">
+  <h2>EduPlatform</h2>
+  <div>
+    <span id="userTag"></span>
+    <button onclick="logout()">Logout</button>
+  </div>
+</header>
+
+<div id="auth" class="auth">
+  <div class="auth-box">
+    <h2>Welcome Back</h2>
+    <p class="sub">Login to continue learning</p>
+    <input id="username" placeholder="Username">
+    <input id="password" type="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+    <button class="ghost" onclick="signup()">Create Account</button>
+  </div>
+</div>
+
+<div id="app" class="hidden">
+
+  <section class="hero">
+    <h1>Continue Learning 🚀</h1>
+    <p>Pick up where you left off</p>
+  </section>
+
+  <section class="grid" id="courseList"></section>
+
+</div>
+
+<script>
+let users = JSON.parse(localStorage.getItem("users")) || [];
+
+let courses = JSON.parse(localStorage.getItem("courses")) || [
+  {name:"Java", img:"https://picsum.photos/300?1", progress:30},
+  {name:"Web Dev", img:"https://picsum.photos/300?2", progress:60},
+  {name:"DSA", img:"https://picsum.photos/300?3", progress:10}
+];
+
+function signup(){
+  let u = document.getElementById("username").value;
+  let p = document.getElementById("password").value;
+
+  if(!u || !p){
+    alert("Fill all fields");
+    return;
+  }
+
+  users.push({u,p});
+  localStorage.setItem("users", JSON.stringify(users));
+
+  alert("Account created 🎉");
+}
+
+function login(){
+  let u = document.getElementById("username").value;
+  let p = document.getElementById("password").value;
+
+  let found = users.find(x => x.u === u && x.p === p);
+
+  if(found){
+    document.getElementById("auth").classList.add("hidden");
+    document.getElementById("app").classList.remove("hidden");
+
+    document.getElementById("userTag").innerText = "👋 " + u;
+
+    loadCourses();
+  } else {
+    alert("Invalid login ❌");
+  }
+}
+
+function logout(){
+  location.reload();
+}
+
+function loadCourses(){
+  let list = document.getElementById("courseList");
+  list.innerHTML = "";
+
+  courses.forEach(c => {
+    let div = document.createElement("div");
+    div.className = "course";
+
+    div.innerHTML = `
+      <img src="${c.img}">
+      <h4>${c.name}</h4>
+      <div class="progress">
+        <div class="bar" style="width:${c.progress}%"></div>
+      </div>
+      <button onclick="watch('${c.name}')">Continue</button>
+    `;
+
+    list.appendChild(div);
+  });
+}
+
+function watch(name){
+  alert("Opening " + name);
+}
+</script>
+
+</body>
+</html>
